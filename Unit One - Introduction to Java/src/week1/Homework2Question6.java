@@ -11,7 +11,7 @@ public class Homework2Question6 {
             c=12;
 
 
-            x1=(-b + (Math.sqrt((b*b)-(4*a*c))))/2*a;
+            x1=(-b + (Math.sqrt((Math.pow(b, 2))-(4*a*c))))/2*a;
             x2=(-b - (Math.sqrt((b*b)-(4*a*c))))/2*a;
 
             System.out.println("The two roots are: "+ x1 + " and " + x2);

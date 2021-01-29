@@ -8,7 +8,7 @@ public class Homework2Question2 {
             double radius, volume;
             radius=10;
 
-            volume=(4*Math.PI*radius*radius*radius)/3;
+            volume=(4*Math.PI*(Math.pow(radius, 3)))/3;
             System.out.println("Volume of the sphere is: " + volume + " units cubed.");
     }    
 }

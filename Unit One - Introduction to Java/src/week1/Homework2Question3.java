@@ -12,7 +12,7 @@ public class Homework2Question3 {
         c=2;
         x=10;
 
-        y = (a*(x*x))+(b*x)+c;
+        y = (a*(Math.pow(x, 2)))+(b*x)+c;
         System.out.println("y = "+ y);
         }
 }

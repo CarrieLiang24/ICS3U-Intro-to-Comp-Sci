@@ -8,7 +8,7 @@ public class Homework2Question1 {
         double radius,area;
         radius = 10;
 
-        area = Math.PI*(radius*radius);
+        area = Math.PI*(Math.pow(radius, 2));
         System.out.println("Area of the circle is: " + area + " units squared.");
         }
     
