@@ -29,7 +29,7 @@ public class UsingBuiltInFunctions {
      * Generating random numbers
      */
     private static void exampleTwo() {
-      double randomNumber = Math.random();      // returns a number 0.0 <= x < 1.0
+      //double randomNumber = Math.random();      // returns a number 0.0 <= x < 1.0
       //System.out.println(randomNumber);   // ex: 0.7919971175599081 or 0.570026695644729
   
       // Goal is to get a random integer between 1 and 10
