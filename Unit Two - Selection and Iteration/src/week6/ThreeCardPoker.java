@@ -43,6 +43,8 @@ public class test {
             String dealerHand = dealCards();
    
             System.out.println("Player: " + playerHand);
+            
+            
             System.out.println("Dealer: ?? ?? ??");
 
             boolean continueBet = continueRound(in, playerWallet);
@@ -52,16 +54,14 @@ public class test {
                 System.out.println("Dealer: " + dealerHand);
 
                 //check to see if the dealer qualifies with at least a queen high
-                String dealerHighestCard = highestCard(playerHand, dealerHand);
+                int dealerHighestCard = highestCard(dealerHand);
                 int dealerHandType = handType(dealerHand);
                 //if dealer doesnt have queen-high, player wins the play wager, but loses ante wager
-                if(dealerHand.indexOf("Q") != -1 && dealerHand.indexOf("K") != -1 && dealerHand.indexOf("A") != -1){
-                //if((dealerHighestCard.indexOf("QUEEN") != -1) && (dealerHighestCard.indexOf("KING") != -1) && (dealerHighestCard.indexOf("ACE") != -1)){
+                if(dealerHand.indexOf("Q") == -1 || dealerHand.indexOf("K") == -1 || dealerHand.indexOf("A") == -1){
                     playerWallet += anteWager;
                     System.out.println("Since the dealer has jack-high or worse, your play wager of $" + anteWager + " has been returned. Your balance is now $" + playerWallet);
-                    System.exit(0);
-                }
-                else { // the dealer has a queen high 
+                    boolean playAgain = playAnother(in, isGameOver);
+                }else // the dealer has a queen high 
                     if (dealerHandType == STRAIGHT_FLUSH)
                         System.out.println("The dealer has a straight flush.");
                     else if(dealerHandType == THREE_OF_A_KIND)
@@ -72,16 +72,19 @@ public class test {
                         System.out.println("The dealer has a flush.");
                     else if(dealerHandType == PAIR)
                         System.out.println("The dealer has a pair.");
-
+                }         
                 //who wins
-                int winner = getWinner(playerHand, dealerHand);
-                int winnings = payOut(winner, anteWager, playerWallet);
+                int winner = getWinner(playerHand, dealerHand, anteWager, playerWallet);
+                int winnings = payOut(winner, anteWager, playerWallet, pairPlus);
                 int playerHandType = handType(playerHand);
                 int pairPlusWins = getPairPlusWinnings(playerHandType, playerWallet, pairPlus);
+                
+                
+                if(playerHandType < PAIR){
+                    //playerWallet -= pairPlus;
+                    System.out.println("You don't have a special hand. You lost your pair plus wager of $" + pairPlus + ". Your current balance is $" + playerWallet);
                 }
                 
-                
-            }
             else if(continueBet == false){
                 System.out.println("Game over! The dealer collected your ante wager of $" + anteWager + " and your pair plus wager (if applicable) of $" + pairPlus + ".");
                 isGameOver = true;
@@ -90,19 +93,24 @@ public class test {
         }
     }
     private static boolean playAnother(Scanner in, boolean isGameOver) {
-        
+        System.out.print("Do you want to play again? (y/n): ");
+        String play = in.nextLine();
+
         boolean validInput = false;
         while(!validInput){
-            System.out.print("Do you want to play again? (y/n): ");
-            String play = in.nextLine();
-            if(play.equals("y")){
-                isGameOver = false;
-                return true;
-            }else{
-                System.out.println("Thanks for playing! ");
-                System.exit(0);
+            try{
+                if(play.equals("y")){
+                    isGameOver = true;
+                    validInput = true;
+                    
+                }else{
+                    System.out.println("Thanks for playing! ");
+                    System.exit(0);
             }
-            
+            } catch (NumberFormatException ex){
+                System.out.print("Please enter a valid answer (y/n): ");
+                play = in.nextLine();
+            }
         }
         return false;
         
@@ -133,20 +141,26 @@ public class test {
     }
     
     
-    private static int payOut(int winner, int anteWager, int playerWallet) {
+    private static int payOut(int winner, int anteWager, int playerWallet, int pairPlus) {
         if(winner == 1){
-            playerWallet +=  2 * anteWager; //ante and play wager are paid out 1 to 1
+            playerWallet +=  (2 * anteWager); //ante and play wager are paid out 1 to 1
             System.out.println("You win! You won your ante wager of $" + anteWager + " and your play wager of $" + anteWager + ".");
-            System.out.println("Your current balance is now $" + playerWallet + ".");
+            //if(pairPlusWins > 0){
+                //playerWallet =  (2 * anteWager) + pairPlus;
+                //System.out.println("And you also won a pair plus bonus of: $" + pairPlusWins + "Your current balance is: $" + playerWallet + ".");
+            //}
+            //else
+                System.out.println("Your current balance is: $" + playerWallet + ".");
         }
         else if(winner == 2){
-            //nothing is taken away from playerwallet because it was already deducted
+            
             System.out.println("You lost! You lost your ante wager of $" + anteWager + " and your play wager of $" + anteWager + ".");
-            System.out.println("Your current balance is now $" + playerWallet + ".");
+            System.out.println("Your current balance is: $" + playerWallet + ".");
         }
         else if(winner == 3){
             playerWallet += anteWager;
             System.out.println("It's a tie! You won your play wager of $" + anteWager + " but you lost your ante wager of $" + anteWager + ".");
+            System.out.println("Your current balance is: $" + playerWallet + ".");
         }
         return winner;
     }
@@ -159,17 +173,19 @@ public class test {
      * @param dealerHand
      * @return
      */
-    private static int getWinner(String playerHand, String dealerHand) {
+    private static int getWinner(String playerHand, String dealerHand, int playerWallet, int anteWager) {
         int playerHandType = handType(playerHand);
         int dealerHandType = handType(dealerHand);
+        //if(dealerHand.indexOf("QKA") == -1){
+            //playerWallet += anteWager;
+            //System.out.println("Since the dealer has jack-high or worse, your play wager of $" + anteWager + " has been returned. Your balance is now $" + playerWallet);
+            //return playerWallet;
+        //}else 
         if (playerHandType > dealerHandType){
             return 1;
-        }
-        else if (dealerHandType > playerHandType){
+        }else if (dealerHandType > playerHandType){
             return 2;
-        }
-            
-        else{ // they both have the same hand type, so need to find out who has highest card
+        }else{ // they both have the same hand type, so need to find out who has highest card
             int playerHighestCard = getMax(playerHand);
             int dealerHighestCard = getMax(dealerHand);
             if(playerHighestCard > dealerHighestCard){
@@ -241,10 +257,6 @@ public class test {
         int get_min = -Math.max(-cardVal1, Math.max(-cardVal2, -cardVal3));
         int get_mid = (cardVal1 + cardVal2 + cardVal3) - (get_max + get_min);
         
-        //int cardFace1 = checkFace(cardVal1);
-        //int cardFace2 = checkFace(cardVal2);
-        //int cardFace3 = checkFace(cardVal3);
-        
         if(isStraightFlush(hand, get_max, get_min, get_mid))
             return STRAIGHT_FLUSH;
         else if(isThreeOfAKind(cardVal1, cardVal2, cardVal3))
@@ -296,13 +308,15 @@ public class test {
      * checks for 3 of the same suit (flush)
      */
     private static boolean isFlush(String hand) {
-        String card1 = getCard();
-        String card2 = getCard();
-        String card3 = getCard();
-        String cardSuit1 = card1.substring(card1.length()-1);
-        String cardSuit2 = card2.substring(card2.length()-1);
-        String cardSuit3 = card3.substring(card3.length()-1);
-        return (cardSuit1.equals(cardSuit2) && cardSuit2.equals(cardSuit3) && cardSuit1.equals(cardSuit3));
+        int space1 = hand.indexOf(" ");
+        int space2 = hand.indexOf(" ", space1 + 1);
+        String card1 = hand.substring(0, space1);
+        String card2 = hand.substring(space1 + 1, space2);
+        String card3 = hand.substring(space2 + 1, hand.length()-1);
+       
+        if(card1.substring(card1.length() - 1).equals(card2.substring(card2.length() - 1)) && card2.substring(card2.length() - 1).equals(card3.substring(card3.length() - 1)))
+            return true;
+        return false;
         
     }
     /**
@@ -348,7 +362,7 @@ public class test {
         else
             return (Integer.parseInt(face));
     }
-    private static String highestCard(String playerHand, String dealerHand) {
+    private static int highestCard(String playerHand) {
         //identifies each space in the hand
         int space1 = playerHand.indexOf(" ");
         int space2 = playerHand.indexOf(" ", space1 + 1);
@@ -363,7 +377,7 @@ public class test {
         int cardVal3 = getCardVal(third);
 
         int get_max = Math.max(cardVal1, Math.max(cardVal2, cardVal3));
-        return null;
+        return get_max;
     }
     /**
      * deals 3 cards to player
